@@ -1,3 +1,9 @@
+# 在 config/settings.py 顶部添加
+from dotenv import load_dotenv
+
+from config.credentials import SecurityError
+
+load_dotenv()  # 加载.env文件
 import os
 from pathlib import Path
 import platform
@@ -14,6 +20,49 @@ SCREENSHOT_DIR = LOG_DIR / "screenshots"
 # 创建必要目录
 for directory in [LOG_DIR, SCREENSHOT_DIR]:
     directory.mkdir(exist_ok=True, parents=True)
+
+
+# 凭证配置（从环境变量读取，带类型提示）
+class Credentials_user:
+    # @staticmethod
+    # def get_username() -> str:
+    #     return os.getenv('LOGIN_USER', 'default_user')  # 生产环境建议移除默认值
+
+    @staticmethod
+    def get_username() -> str:
+        username = os.getenv('LOGIN_USER')  # 无默认值
+        if not username:
+            raise ValueError("必须配置LOGIN_USER环境变量")
+        return username
+
+    @classmethod
+    def validate(cls):
+        """严格验证凭证格式"""
+        username = cls.get_username()
+        if not username.isprintable() or len(username) < 4:
+            raise SecurityError("用户名格式无效")
+
+    # @staticmethod
+    # def get_password() -> str:
+    #     return os.getenv('LOGIN_PASS', 'default_pass')  # 生产环境建议移除默认值
+
+    # @classmethod
+    # def validate(cls):
+    #     """验证凭证是否有效"""
+    #     if cls.get_username() == 'default_user' or cls.get_password() == 'default_pass':
+    #         raise ValueError("未配置有效的登录凭证")
+
+
+    # cls 是类方法的必需参数，代表当前类
+    # @classmethod
+    # def validate(cls):
+    #     """验证凭证是否有效"""
+    #     if cls.get_username() == 'default_user':
+    #         raise ValueError("未配置有效的用户")
+
+
+# 指定浏览器
+os.environ["PLAYWRIGHT_BROWSERS_PATH"] = r"D:\workspace\python\clickgj\browsers\chromium-1161\chrome-win\chrome.exe"
 
 # 浏览器配置
 IS_WINDOWS = platform.system() == "Windows"

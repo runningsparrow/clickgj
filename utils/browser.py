@@ -1,5 +1,6 @@
 import logging
-from datetime import datetime, time
+import time
+from datetime import datetime
 from pathlib import Path
 from typing import Optional, Tuple
 from playwright.sync_api import Page, BrowserContext, Browser
@@ -24,10 +25,19 @@ class BrowserUtils:
             ]
         )
 
+    # @classmethod
+    # def launch_browser(cls, playwright) -> Tuple[Browser, BrowserContext, Page]:
+    #     """启动浏览器并返回实例三元组"""
+    #     browser = playwright.chromium.launch(**BROWSER_CONFIG)
+    #     context = browser.new_context()
+    #     page = context.new_page()
+    #     return browser, context, page
+
     @classmethod
-    def launch_browser(cls, playwright) -> Tuple[Browser, BrowserContext, Page]:
-        """启动浏览器并返回实例三元组"""
-        browser = playwright.chromium.launch(**BROWSER_CONFIG)
+    def launch_browser(cls, playwright, custom_config=None):
+        # 合并默认配置和自定义配置
+        config = {**BROWSER_CONFIG, **(custom_config or {})}
+        browser = playwright.chromium.launch(**config)
         context = browser.new_context()
         page = context.new_page()
         return browser, context, page
