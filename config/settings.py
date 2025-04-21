@@ -9,8 +9,12 @@ from pathlib import Path
 import platform
 
 # 基础配置
-BASE_URL = "https://www.jisilu.cn/"  # 替换为您的实际目标网址
-TIMEOUT = 30  # 默认超时时间(秒)
+# BASE_URL = "https://www.jisilu.cn/"  # 替换为您的实际目标网址
+# TIMEOUT = 30  # 默认超时时间(秒)
+
+# ==================== 基础配置 ====================
+BASE_URL = os.getenv('BASE_URL', 'https://www.xxxxxx.cn/')  # 从.env读取，带默认值
+TIMEOUT = int(os.getenv('TIMEOUT', '30'))  # 超时时间(秒)
 
 # 路径配置
 BASE_DIR = Path(__file__).parent.parent
@@ -62,20 +66,41 @@ class Credentials_user:
 
 
 # 指定浏览器
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = r"D:\workspace\python\clickgj\browsers\chromium-1161\chrome-win\chrome.exe"
+# os.environ["PLAYWRIGHT_BROWSERS_PATH"] = r"D:\xxxxxxx\python\clickgj\browsers\chromium-1161\chrome-win\chrome.exe"
+# ==================== 浏览器配置 ====================
+# 浏览器安装路径（从.env读取，无默认值）
+PLAYWRIGHT_BROWSERS_PATH = os.getenv('PLAYWRIGHT_BROWSERS_PATH')
+if PLAYWRIGHT_BROWSERS_PATH:
+    os.environ["PLAYWRIGHT_BROWSERS_PATH"] = PLAYWRIGHT_BROWSERS_PATH
+
 
 # 浏览器配置
+# IS_WINDOWS = platform.system() == "Windows"
+# BROWSER_CONFIG = {
+#     "headless": True,  # 后台运行
+#     "slow_mo": 500,  # 操作间隔(毫秒)
+#     "channel": "chrome" if IS_WINDOWS else None,
+#     "args": ["--no-sandbox"] if not IS_WINDOWS else []
+# }
+
+# 浏览器启动参数
 IS_WINDOWS = platform.system() == "Windows"
 BROWSER_CONFIG = {
-    "headless": True,  # 后台运行
-    "slow_mo": 500,  # 操作间隔(毫秒)
-    "channel": "chrome" if IS_WINDOWS else None,
+    "headless": os.getenv('HEADLESS', 'true').lower() == 'true',  # 从.env读取
+    "slow_mo": int(os.getenv('SLOW_MO', '500')),  # 操作延迟(毫秒)
+    "channel": os.getenv('BROWSER_CHANNEL', 'chrome' if IS_WINDOWS else None),
     "args": ["--no-sandbox"] if not IS_WINDOWS else []
 }
 
 # 日志配置
+# LOGGING = {
+#     "level": "INFO",
+#     "format": "%(asctime)s - %(levelname)s - %(message)s",
+#     "filename": LOG_DIR / "automation.log"
+# }
+# ==================== 日志配置 ====================
 LOGGING = {
-    "level": "INFO",
+    "level": os.getenv('LOG_LEVEL', 'INFO'),
     "format": "%(asctime)s - %(levelname)s - %(message)s",
-    "filename": LOG_DIR / "automation.log"
+    "filename": LOG_DIR / os.getenv('LOG_FILE', 'automation.log')
 }
